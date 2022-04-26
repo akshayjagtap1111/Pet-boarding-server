@@ -7,7 +7,11 @@ const pet_schema = new Schema({
   from: { type: String, required: true },
   to: { type: String, required: true },
   status:{type: String},
-
+  user:{
+    type:Schema.Types.ObjectId,
+    ref: "users",
+    required: true,
+  },
   place:{
     type:Schema.Types.ObjectId,
     ref: "pet_place",

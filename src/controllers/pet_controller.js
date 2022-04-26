@@ -1,12 +1,16 @@
 const router = require("express").Router();
 
 const Pet = require("../models/pet");
+const { userAuth } = require("../utils/Auth");
 
 //user
 
-router.post("/add", async (req, res) => {
+router.post("/add",userAuth, async (req, res) => {
   try {
-    let pet_req = { ...req.body, status: "Pending" };
+    const user= req.user._id
+    console.log(req.user)
+    let pet_req = { ...req.body, status: "Pending",user:user };
+    console.log(pet_req)
 
     console.log(pet_req);
     const new_pet = await Pet.create(pet_req);
@@ -38,7 +42,7 @@ router.patch("/approve/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",userAuth, async (req, res) => {
   try {
     await Pet.findByIdAndDelete(req.params.id);
 
@@ -53,7 +57,7 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
-router.get("/all", async (req, res) => {
+router.get("/all",userAuth, async (req, res) => {
   try {
     const all_pets = await Pet.find().lean().exec();
 

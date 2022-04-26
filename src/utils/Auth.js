@@ -9,7 +9,7 @@ const userRegister = async (userDetails, role, res) => {
   try {
     let usernameNotTaken = await validateUsername(userDetails.username);
     if (!usernameNotTaken) {
-      return res.status(400).json({
+      return res.status(400).send({
         message: "username already taken",
         success: false,
       });
@@ -18,7 +18,7 @@ const userRegister = async (userDetails, role, res) => {
     let emailNotRegistered = await validateEmail(userDetails.email);
 
     if (!emailNotRegistered) {
-      return res.status(400).json({
+      return res.status(400).send({
         message: `Email is already registered.`,
         success: false,
       });
@@ -46,58 +46,58 @@ const userRegister = async (userDetails, role, res) => {
 };
 
 const userLogin = async (userDetails, role, res) => {
-try{
-  let { username, password } = userDetails;
+  try {
+    let { username, password } = userDetails;
 
-  const user = await User.findOne({ username });
-  if (!user) {
-    return res.status(404).json({
-      message: "Username is not found. Invalid login credentials.",
-      success: false,
-    });
-  }
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({
+        message: "Username is not found. Invalid login credentials.",
+        success: false,
+      });
+    }
 
-  if (user.role !== role) {
-    return res.status(403).json({
-      message: "Please make sure you are logging in from the right portal.",
-      success: false,
-    });
-  }
+    if (user.role !== role) {
+      return res.status(403).json({
+        message: "Please make sure you are logging in from the right portal.",
+        success: false,
+      });
+    }
 
-  let isMatch = bcrypt.compare(password, user.password);
-  if (isMatch) {
-    let token = jwt.sign(
-      {
-        user_id: user._id,
-        role: user.role,
+    let isMatch = bcrypt.compare(password, user.password);
+    if (isMatch) {
+      let token = jwt.sign(
+        {
+          user_id: user._id,
+          role: user.role,
+          username: user.username,
+          email: user.email,
+        },
+        SECRET,
+        { expiresIn: "2 days" }
+      );
+
+      let result = {
         username: user.username,
-        email: user.email,
-      },
-      SECRET,
-      { expiresIn: "2 days" }
-    );
+        role: user.role,
+        token: `Bearer ${token}`,
+        expiresIn: 168,
+      };
 
-    let result = {
-      username: user.username,
-      role: user.role,
-      token: `Bearer ${token}`,
-      expiresIn: 168,
-    };
-
-    return res.status(200).json({
-      ...result,
-      message: "Successfully Loggrd in",
-      success: true,
-    });
-  } else {
-    return res.status(403).json({
-      message: "Incorrect Password",
-      success: false,
-    });
+      return res.status(200).json({
+        ...result,
+        message: "Successfully Loggrd in",
+        success: true,
+      });
+    } else {
+      return res.status(403).json({
+        message: "Incorrect Password",
+        success: false,
+      });
+    }
+  } catch (err) {
+    console.log(err.message);
   }
-}catch(err){
-console.log(err.message)
-}
 };
 
 const validateUsername = async (username) => {
@@ -110,10 +110,8 @@ const validateEmail = async (email) => {
   return user ? false : true;
 };
 
-
-
 ///passport middleware
-//for every route where you want to authorise request you need to pass this middleware and 
+//for every route where you want to authorise request you need to pass this middleware and
 //that request should also have header containing token
 
 const userAuth = passport.authenticate("jwt", { session: false });
@@ -123,7 +121,7 @@ const serilizeUser = (user) => {
     username: user.username,
     email: user.email,
     _id: user._id,
-    role:user.role,
+    role: user.role,
     updatedAt: user.updatedAt,
     createdAt: user.createdAt,
   };
@@ -136,7 +134,6 @@ const checkRole = (roles) => (req, res, next) => {
     ? res.status(401).json("Unauthorised")
     : next();
 };
-
 
 module.exports = {
   userRegister,

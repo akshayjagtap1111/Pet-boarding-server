@@ -2,6 +2,7 @@ const PetPlace = require("../models/pet_place");
 
 const express = require("express");
 
+
 const router = express.Router();
 
 const { checkRole, userAuth } = require("../utils/Auth");
@@ -15,9 +16,10 @@ router.get("", async (req, res) => {
     let pet_place;
     if (ord1) {
       if (city && verified) {
-        console.log("one");
+        const regex = new RegExp(escapeRegex(city),'gi')
+     
         let filter = {
-          city: city,
+          city: regex,
           verified: verified,
         };
         pet_place = await PetPlace.find(filter)
@@ -28,8 +30,12 @@ router.get("", async (req, res) => {
           .lean()
           .exec();
       } else if (city && !verified) {
-        console.log("two");
-        pet_place = await PetPlace.find({ city: city })
+        const regex = new RegExp(escapeRegex(city),'gi')
+
+       
+        pet_place = await PetPlace.find({
+          city: regex,
+        })
           .sort({ cost_per_day: ord1 })
           .sort({ rating: ord2 })
           .skip((page - 1) * qty)
@@ -37,7 +43,7 @@ router.get("", async (req, res) => {
           .lean()
           .exec();
       } else if (!city && verified) {
-        console.log("three");
+
         pet_place = await PetPlace.find({ verified: verified })
           .sort({ cost_per_day: ord1 })
           .sort({ rating: ord2 })
@@ -46,7 +52,7 @@ router.get("", async (req, res) => {
           .lean()
           .exec();
       } else {
-        console.log("else");
+
         pet_place = await PetPlace.find({})
           .sort({ cost_per_day: ord1 })
           .sort({ rating: ord2 })
@@ -57,9 +63,10 @@ router.get("", async (req, res) => {
       }
     } else {
       if (city && verified) {
-        console.log("one");
+        const regex = new RegExp(escapeRegex(city),'gi')
+
         let filter = {
-          city: city,
+          city: regex,
           verified: verified,
         };
         pet_place = await PetPlace.find(filter)
@@ -70,8 +77,13 @@ router.get("", async (req, res) => {
           .lean()
           .exec();
       } else if (city && !verified) {
-        console.log("two");
-        pet_place = await PetPlace.find({ city: city })
+        const regex = new RegExp(escapeRegex(city),'gi')
+
+
+    
+        pet_place = await PetPlace.find({
+          city: regex,
+        })
           .sort({ rating: ord2 })
           .sort({ cost_per_day: ord1 })
           .skip((page - 1) * qty)
@@ -79,7 +91,7 @@ router.get("", async (req, res) => {
           .lean()
           .exec();
       } else if (!city && verified) {
-        console.log("three");
+
         pet_place = await PetPlace.find({ verified: verified })
           .sort({ rating: ord2 })
           .sort({ cost_per_day: ord1 })
@@ -88,7 +100,7 @@ router.get("", async (req, res) => {
           .lean()
           .exec();
       } else {
-        console.log("else");
+
         pet_place = await PetPlace.find({})
           .sort({ rating: ord2 })
           .sort({ cost_per_day: ord1 })
@@ -183,4 +195,10 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
+
+
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
 module.exports = router;
