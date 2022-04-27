@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const passport = require("passport");
 
 const { PORT } = require("./src/config/index");
-
+const port = PORT || 3000;
 const connectDB = require("./src/config/db");
 
 const app = express();
@@ -24,7 +24,7 @@ app.use("/pet-place", require("./src/controllers/pet_place_controller"));
 
 app.use("/pet", require("./src/controllers/pet_controller"));
 
-app.listen(PORT, () => {
+app.listen(port, () => {
   console.log("listening");
   connectDB();
 });
