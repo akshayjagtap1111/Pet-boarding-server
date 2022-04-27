@@ -8,11 +8,9 @@ const { userAuth } = require("../utils/Auth");
 router.post("/add",userAuth, async (req, res) => {
   try {
     const user= req.user._id
-    console.log(req.user)
+   
     let pet_req = { ...req.body, status: "Pending",user:user };
-    console.log(pet_req)
-
-    console.log(pet_req);
+   
     const new_pet = await Pet.create(pet_req);
 
     res.status(201).send(new_pet);

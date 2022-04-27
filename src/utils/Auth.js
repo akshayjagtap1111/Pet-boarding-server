@@ -96,7 +96,7 @@ const userLogin = async (userDetails, role, res) => {
       });
     }
   } catch (err) {
-    console.log(err.message);
+    
   }
 };
 

@@ -11,7 +11,7 @@ router.get("", async (req, res) => {
   try {
     const { ord1, ord2, page, qty, city, verified } = req.query;
 
-    console.log(ord1, ord2, page, qty, city, verified);
+
 
     let pet_place;
     if (ord1) {
@@ -150,7 +150,7 @@ router.get("/:name", async (req, res) => {
 
 router.post("/add", userAuth, checkRole(["admin"]), async (req, res) => {
   try {
-    console.log("add");
+   
     const pet_place = await PetPlace.create(req.body);
 
     res.status(200).send(pet_place);
